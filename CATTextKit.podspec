@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'CATTextKit'
-  s.version          = '0.1.5'
+  s.version          = '0.1.6'
   s.summary          = 'text view and text label'
 
 # This description is used to generate tags and improve search results.

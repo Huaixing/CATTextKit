@@ -77,7 +77,9 @@ typedef NS_ENUM(NSInteger, CATBarButtonType) {
     CATKeyboardBarButton *button = [[CATKeyboardBarButton alloc] init];
     button.backgroundColor = [UIColor clearColor];
     
-    UIImage *image = [UIImage imageNamed:imageNamed inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
+    NSString *bundlePath = [[NSBundle bundleForClass:[self class]].resourcePath stringByAppendingPathComponent:@"/CATTextKit.bundle"];
+    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
+    UIImage *image = [UIImage imageNamed:imageNamed inBundle:bundle compatibleWithTraitCollection:nil];
     [button setImage:image forState:UIControlStateNormal];
     [button addTarget:self action:@selector(barButtonDidClick:) forControlEvents:UIControlEventTouchUpInside];
     button.type = buttonType;
