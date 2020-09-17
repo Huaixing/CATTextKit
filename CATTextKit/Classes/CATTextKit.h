@@ -9,10 +9,11 @@
 #ifndef CATTextKit_h
 #define CATTextKit_h
 
-#import "CATTextView.h"
-#import "CATKeyboard.h"
-#import "CATEmojiManager.h"
-#import "CATKeyboardBar.h"
+#import <CATTextKit/CATEmojiManager.h>
+#import <CATTextKit/CATKeyboard.h>
+#import <CATTextKit/CATKeyboardBar.h>
+
+#import <CATTextKit/CATTextView.h>
 
 
 #endif /* CATTextKit_h */

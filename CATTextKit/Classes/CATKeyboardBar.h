@@ -7,29 +7,25 @@
 
 #import <UIKit/UIKit.h>
 
-@class CATKeyboardBar;
-
-
-typedef NS_ENUM(NSInteger, CATKeyboardType) {
-    CATKeyboardTypeKeyboard,
-    CATKeyboardTypeEmoji,
-    CATKeyboardTypeNone,
+typedef NS_ENUM(NSInteger, CATBarButtonType) {
+    CATBarButtonTypeKeyboard,
+    CATBarButtonTypeEmoji,
+    CATBarButtonTypePhoto,
 };
 
+@class CATKeyboardBar;
 
 @protocol CATKeyboardBarDelegate <NSObject>
 
 @optional
-- (void)keyboardBarDidClickPickPhotoButton:(CATKeyboardBar *)bar;
-- (void)keyboardBarDidClickToChangeKeyboard:(CATKeyboardBar *)bar;
+- (void)keyboardBarDidClickBarButton:(CATKeyboardBar *)bar;
 
 @end
 
-
-
 @interface CATKeyboardBar : UIView
-/// current selected keyboard type
-@property (nonatomic, assign, readonly) CATKeyboardType currentKeyboardType;
+
+/// 当前点击的按钮类型
+@property (nonatomic, assign) CATBarButtonType currentClickType;
 
 /// delgate
 @property (nonatomic, weak) id<CATKeyboardBarDelegate> delegate;

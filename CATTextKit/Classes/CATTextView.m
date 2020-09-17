@@ -7,8 +7,6 @@
 
 #import "CATTextView.h"
 
-
-
 @interface CATTextView () {
     // 是否已经设置了placeholder的位置
     BOOL _settedPlaceholderPosition;

@@ -8,8 +8,9 @@
 
 #import "CATViewController.h"
 #import "CATTextKit.h"
+#import <CATCommonKit/CATCommonKit.h>
 
-@interface CATViewController ()<CATKeyboardBarDelegate>
+@interface CATViewController ()<CATKeyboardBarDelegate, UITextViewDelegate>
 {
     CGRect _keyboardEndFrame;
 }
@@ -30,93 +31,108 @@
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor whiteColor];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardFrameWillChange:) name:UIKeyboardWillChangeFrameNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     
-    _textView = [[CATTextView alloc] initWithFrame:CGRectMake(0, 100, CGRectGetWidth(self.view.frame), 300)];
+    _textView = [[CATTextView alloc] initWithFrame:CGRectMake(0, 100, self.view.width, 300)];
     _textView.backgroundColor = [UIColor lightGrayColor];
+    _textView.delegate = self;
     [self.view addSubview:_textView];
     
-    _keyboard = [[CATKeyboard alloc] initWithFrame:CGRectMake(0, CGRectGetHeight([UIScreen mainScreen].bounds), CGRectGetWidth(self.view.frame), 355) categorys:nil];
+    _keyboard = [[CATKeyboard alloc] initWithFrame:CGRectMake(0, CGRectGetHeight([UIScreen mainScreen].bounds), self.view.width, 355) categorys:nil];
     [self.view addSubview:_keyboard];
     
     CGFloat barHeight = 64;
-    _keyboardBar = [[CATKeyboardBar alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.view.frame) - barHeight, CGRectGetWidth(_keyboard.frame), barHeight)];
+    _keyboardBar = [[CATKeyboardBar alloc] initWithFrame:CGRectMake(0, self.view.height - barHeight, _keyboard.width, barHeight)];
     _keyboardBar.backgroundColor = [UIColor redColor];
     _keyboardBar.delegate = self;
     [self.view addSubview:_keyboardBar];
 }
 
-- (void)keyboardFrameWillChange:(NSNotification *)notification {
+- (void)keyboardWillShow:(NSNotification *)notification {
     CGRect endFrame = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
     _keyboardEndFrame = endFrame;
+    _keyboardBar.currentClickType = CATBarButtonTypeKeyboard;
 }
 
-#pragma mark - CATKeyboardBarDelegate
-- (void)keyboardBarDidClickPickPhotoButton:(CATKeyboardBar *)bar {
-    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
-    if (bar.currentKeyboardType == CATKeyboardTypeKeyboard) {
-        [_textView resignFirstResponder];
-    } else if (bar.currentKeyboardType == CATKeyboardTypeEmoji) {
-        // 当前显示的表情键盘，需要隐藏表情键盘
-        if (CGRectGetMinY(_keyboard.frame) < screenHeight) {
-            [UIView animateWithDuration:0.25 animations:^{
-                CGRect frame = self.keyboard.frame;
-                frame.origin.y = screenHeight;
-                self.keyboard.frame = frame;
-            }];
-        }
+- (void)keyboardWillHide:(NSNotification *)notification {
+    CGRect endFrame = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    _keyboardEndFrame = endFrame;
+    if (_keyboardBar.currentClickType == CATBarButtonTypeEmoji) {
+        _keyboardBar.currentClickType = CATBarButtonTypeEmoji;
     }
-    if (CGRectGetMaxY(_keyboardBar.frame) < screenHeight) {
-        // 键盘上方bar回落至底部
-        CGFloat toFrameY = screenHeight - CGRectGetHeight(_keyboardBar.frame);
+}
+
+- (void)textViewBecomeActivity {
+    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
+    // 显示系统键盘
+    if (!_textView.isFirstResponder) {
+        [_textView becomeFirstResponder];
+    }
+    // 隐藏自定键盘
+    if (CGRectGetMinY(_keyboard.frame) < screenHeight) {
         [UIView animateWithDuration:0.25 animations:^{
-            CGRect frame = self.keyboardBar.frame;
-            frame.origin.y = toFrameY;
-            self.keyboardBar.frame = frame;
+            self.keyboard.y = screenHeight;
+        }];
+    }
+    // 键盘上方bar始终显示
+    CGFloat toFrameY = CGRectGetMinY(_keyboardEndFrame) - _keyboardBar.height;
+    [UIView animateWithDuration:0.25 animations:^{
+        self.keyboardBar.y = toFrameY;
+    }];
+}
+
+- (void)keyboardBecomeActivity {
+    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
+    // 隐藏系统键盘
+    if (_textView.isFirstResponder) {
+        [_textView resignFirstResponder];
+    }
+    
+    // 显示自定义键盘
+    if (CGRectGetMinY(_keyboard.frame) >= screenHeight) {
+        [UIView animateWithDuration:0.25 animations:^{
+            self.keyboard.y = (screenHeight - self.keyboard.height);
+        }];
+    }
+    // 键盘上方bar始终显示
+    CGFloat toFrameY = toFrameY = (screenHeight - _keyboard.height - _keyboardBar.height);
+    [UIView animateWithDuration:0.25 animations:^{
+        self.keyboardBar.y = toFrameY;
+    }];
+}
+
+- (void)resignActivity {
+    if (_textView.isFirstResponder) {
+        [_textView resignFirstResponder];
+    }
+    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
+    // 隐藏自定键盘
+    if (CGRectGetMinY(_keyboard.frame) < screenHeight) {
+        [UIView animateWithDuration:0.25 animations:^{
+            self.keyboard.y = screenHeight;
+        }];
+    }
+    // 键盘上方bar始终显示
+    if (_keyboardBar.y < screenHeight) {
+        CGFloat toFrameY = screenHeight - _keyboardBar.height;
+        [UIView animateWithDuration:0.25 animations:^{
+            self.keyboardBar.y = toFrameY;
         }];
     }
 }
 
-- (void)keyboardBarDidClickToChangeKeyboard:(CATKeyboardBar *)bar {
+
+#pragma mark - CATKeyboardBarDelegate
+- (void)keyboardBarDidClickBarButton:(CATKeyboardBar *)bar {
     
-    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
-    if (bar.currentKeyboardType == CATKeyboardTypeKeyboard) {
-        // 显示系统键盘
-        [_textView becomeFirstResponder];
-        // 隐藏自定键盘
-        if (CGRectGetMinY(_keyboard.frame) < screenHeight) {
-            [UIView animateWithDuration:0.25 animations:^{
-                CGRect frame = self.keyboard.frame;
-                frame.origin.y = screenHeight;
-                self.keyboard.frame = frame;
-            }];
-        }
-        
-    } else if (bar.currentKeyboardType == CATKeyboardTypeEmoji) {
-        // 隐藏系统键盘
-        [_textView resignFirstResponder];
-        // 显示自定义键盘
-        if (CGRectGetMinY(_keyboard.frame) >= screenHeight) {
-            [UIView animateWithDuration:0.25 animations:^{
-                CGRect frame = self.keyboard.frame;
-                frame.origin.y = screenHeight - CGRectGetHeight(self.keyboard.frame);
-                self.keyboard.frame = frame;
-            }];
-        }
+    if (bar.currentClickType == CATBarButtonTypeKeyboard) {
+        [self textViewBecomeActivity];
+    } else if (bar.currentClickType == CATBarButtonTypeEmoji) {
+        [self keyboardBecomeActivity];
+    } else {
+        [self resignActivity];
     }
-    
-    // 键盘上方bar始终显示
-    CGFloat toFrameY = screenHeight - CGRectGetHeight(_keyboardBar.frame);
-    if (bar.currentKeyboardType == CATKeyboardTypeKeyboard) {
-        toFrameY = CGRectGetMinY(_keyboardEndFrame) - CGRectGetHeight(_keyboardBar.frame);
-    } else if (bar.currentKeyboardType == CATKeyboardTypeEmoji) {
-        toFrameY = (screenHeight - CGRectGetHeight(_keyboard.frame)) - CGRectGetHeight(_keyboardBar.frame);
-    }
-    [UIView animateWithDuration:0.25 animations:^{
-        CGRect frame = self.keyboardBar.frame;
-        frame.origin.y = toFrameY;
-        self.keyboardBar.frame = frame;
-    }];
 }
 
 /*

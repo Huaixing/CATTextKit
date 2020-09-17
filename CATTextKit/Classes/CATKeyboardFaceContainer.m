@@ -11,6 +11,7 @@
 #import "CATKeyboardFaceButton.h"
 
 #import "CATEmojiModel.h"
+#import <CATCommonKit/CATCommonKit.h>
 
 @interface CATKeyboardFaceContainer ()
 /// scrollview
@@ -61,7 +62,7 @@
     
     if (_categoryItem.type == CATKeyboardFaceTypeEmoji) {
         // emoji
-        CGFloat buttonWidth = (CGRectGetWidth(_scrollView.frame) - _categoryItem.horMargin) / _categoryItem.columnCount;
+        CGFloat buttonWidth = (_scrollView.width - _categoryItem.horMargin) / _categoryItem.columnCount;
         CGFloat buttonHeight = buttonWidth;
         
         for (NSInteger index = 0; index < self.faceButtons.count; index ++) {
@@ -73,7 +74,7 @@
             button.frame = CGRectMake(col * (buttonWidth + _categoryItem.horMargin), row * (buttonHeight + _categoryItem.verMargin), buttonWidth, buttonHeight);
         }
     }
-    _scrollView.contentSize = CGSizeMake(CGRectGetWidth(_scrollView.frame), CGRectGetMaxY([self.faceButtons lastObject].frame));
+    _scrollView.contentSize = CGSizeMake(_scrollView.width, [self.faceButtons lastObject].bottom);
 }
 
 @end

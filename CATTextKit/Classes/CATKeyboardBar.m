@@ -6,19 +6,13 @@
 //
 
 #import "CATKeyboardBar.h"
+#import <CATCommonKit/CATCommonKit.h>
 
-
-
-typedef NS_ENUM(NSInteger, CATBarButtonType) {
-    CATBarButtonTypeKeyboard,
-    CATBarButtonTypeEmoji,
-    CATBarButtonTypePhoto,
-};
 
 @interface CATKeyboardBarButton : UIButton
+
 /// 按钮对应的类型
 @property (nonatomic, assign) CATBarButtonType type;
-
 @end
 
 @implementation CATKeyboardBarButton
@@ -37,8 +31,6 @@ typedef NS_ENUM(NSInteger, CATBarButtonType) {
 /// photo button
 @property (nonatomic, strong) CATKeyboardBarButton *pickPhotoButton;
 
-
-
 @end
 
 @implementation CATKeyboardBar
@@ -53,8 +45,7 @@ typedef NS_ENUM(NSInteger, CATBarButtonType) {
         
         _pickPhotoButton = [self barButtonWithImageNamed:@"cat_text_keyboard_bar_photo_type_icon" buttonType:CATBarButtonTypePhoto];
         
-        _emojiButton.hidden = YES;
-        _currentKeyboardType = CATKeyboardTypeKeyboard;
+        [self setupDefaultStatus];
     }
     return self;
 }
@@ -62,13 +53,19 @@ typedef NS_ENUM(NSInteger, CATBarButtonType) {
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    _keyboardButton.frame = CGRectMake(0, 0, CGRectGetHeight(self.frame), CGRectGetHeight(self.frame));
+    _keyboardButton.frame = CGRectMake(0, 0, self.height, self.height);
     _emojiButton.frame = _keyboardButton.frame;
     
-    _pickPhotoButton.frame = CGRectMake(CGRectGetMaxX(_keyboardButton.frame), 0, CGRectGetHeight(self.frame), CGRectGetHeight(self.frame));
+    _pickPhotoButton.frame = CGRectMake(_keyboardButton.right, 0, self.height, self.height);
 }
 
 #pragma Private
+
+/// 设置默认状态
+- (void)setupDefaultStatus {
+    _emojiButton.hidden = YES;
+    _currentClickType = CATBarButtonTypeKeyboard;
+}
 
 /// 创建键盘bar上按钮
 /// @param imageNamed icon
@@ -90,29 +87,23 @@ typedef NS_ENUM(NSInteger, CATBarButtonType) {
 #pragma mark - Action
 - (void)barButtonDidClick:(CATKeyboardBarButton *)sender {
     
-    if (sender.type == CATBarButtonTypePhoto) {
-        // 点击照片
-        if (self.delegate && [self.delegate respondsToSelector:@selector(keyboardBarDidClickPickPhotoButton:)]) {
-            [self.delegate keyboardBarDidClickPickPhotoButton:self];
-        }
-        _currentKeyboardType = CATKeyboardTypeNone;
-        return;
-    }
-    
-    if (sender.type == CATBarButtonTypeKeyboard) {
-        _emojiButton.hidden = NO;
-        _keyboardButton.hidden = YES;
-        _currentKeyboardType = CATKeyboardTypeKeyboard;
-    } else if (sender.type == CATBarButtonTypeEmoji) {
-        _keyboardButton.hidden = NO;
-        _emojiButton.hidden = YES;
-        _currentKeyboardType = CATKeyboardTypeEmoji;
-    }
-    if (self.delegate && [self.delegate respondsToSelector:@selector(keyboardBarDidClickToChangeKeyboard:)]) {
-        [self.delegate keyboardBarDidClickToChangeKeyboard:self];
-    }
+    self.currentClickType = sender.type;
 }
 
 #pragma mark - Public
+
+- (void)setCurrentClickType:(CATBarButtonType)currentClickType {
+    _currentClickType = currentClickType;
+    if (currentClickType == CATBarButtonTypeKeyboard) {
+        _emojiButton.hidden = NO;
+        _keyboardButton.hidden = YES;
+    } else if (currentClickType == CATBarButtonTypeEmoji) {
+        _keyboardButton.hidden = NO;
+        _emojiButton.hidden = YES;
+    }
+    if (self.delegate && [self.delegate respondsToSelector:@selector(keyboardBarDidClickBarButton:)]) {
+        [self.delegate keyboardBarDidClickBarButton:self];
+    }
+}
 
 @end
