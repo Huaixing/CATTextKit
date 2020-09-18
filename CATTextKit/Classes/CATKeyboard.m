@@ -10,7 +10,7 @@
 #import "CATKeyboardFaceItemButton.h"
 #import "CATEmojiManager.h"
 
-@interface CATKeyboard ()
+@interface CATKeyboard ()<CATKeyboardFaceContainerDelegate>
 /// 功能种类模块
 @property (nonatomic, strong) UIView *categoryBar;
 /// category buttons
@@ -125,6 +125,7 @@
     for (NSInteger index = 0; index < _categoryItems.count; index ++) {
         CATKeyboardFaceContainer *container = [[CATKeyboardFaceContainer alloc] init];
         container.backgroundColor = [UIColor purpleColor];
+        container.delegate = self;
         container.categoryItem = [_categoryItems objectAtIndex:index];
         [_scrollView addSubview:container];
         [self.faceContainters addObject:container];
@@ -144,6 +145,13 @@
         _categoryButtons = [[NSMutableArray alloc] init];
     }
     return _categoryButtons;
+}
+
+#pragma mark - CATKeyboardFaceContainerDelegate
+- (void)keyboardFaceContainer:(CATKeyboardFaceContainer *)faceContainer didClickFaceModel:(CATEmojiModel *)faceModel {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(keyboard:didInputEmoji:)]) {
+        [self.delegate keyboard:self didInputEmoji:faceModel];
+    }
 }
 
 

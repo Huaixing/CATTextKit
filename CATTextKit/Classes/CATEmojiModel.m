@@ -14,4 +14,13 @@
     
 }
 
+- (UIImage *)faceImage {
+    NSURL *bundleUrl = [[NSBundle mainBundle] URLForResource:@"emoji" withExtension:@"bundle"];
+    NSBundle *bundle = [NSBundle bundleWithURL:bundleUrl];
+    UIImage *image = [UIImage imageNamed:self.icon inBundle:bundle compatibleWithTraitCollection:nil];
+    return image;
+}
+
+
+
 @end

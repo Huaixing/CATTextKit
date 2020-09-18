@@ -19,5 +19,8 @@
 /// type：自定义表情
 @property (nonatomic, assign) BOOL type;
 
+
+/// image
+@property (nonatomic, strong, readonly) UIImage *faceImage;
 @end
 

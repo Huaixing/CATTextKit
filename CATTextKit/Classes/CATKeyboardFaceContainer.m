@@ -50,6 +50,7 @@
         CATKeyboardFaceButton *button = [[CATKeyboardFaceButton alloc] init];
         button.emojiModel = model;
         button.backgroundColor = [UIColor whiteColor];
+        [button addTarget:self action:@selector(faceButtonDidClick:) forControlEvents:UIControlEventTouchUpInside];
         [self.faceButtons addObject:button];
         [_scrollView addSubview:button];
     }
@@ -75,6 +76,14 @@
         }
     }
     _scrollView.contentSize = CGSizeMake(_scrollView.width, [self.faceButtons lastObject].bottom);
+}
+
+#pragma mark - Action
+- (void)faceButtonDidClick:(CATKeyboardFaceButton *)sender {
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(keyboardFaceContainer:didClickFaceModel:)]) {
+        [self.delegate keyboardFaceContainer:self didClickFaceModel:sender.emojiModel];
+    }
 }
 
 @end

@@ -10,6 +10,7 @@
 #define CATTextKit_h
 
 #import <CATTextKit/CATEmojiManager.h>
+#import <CATTextKit/CATEmojiModel.h>
 #import <CATTextKit/CATKeyboard.h>
 #import <CATTextKit/CATKeyboardBar.h>
 
