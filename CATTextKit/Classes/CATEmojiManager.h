@@ -15,6 +15,8 @@
 @property (nonatomic, strong, readonly) NSArray<CATEmojiModel *> *emojiModels;
 
 + (instancetype)manager;
+/// 表情正则
++ (NSRegularExpression *)regexEmoticon;
 
 @end
 

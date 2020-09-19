@@ -7,6 +7,8 @@
 
 #import "CATTextView.h"
 
+#import "CATEmojiManager.h"
+
 @interface CATTextView () {
     // 是否已经设置了placeholder的位置
     BOOL _settedPlaceholderPosition;
@@ -14,6 +16,8 @@
 
 /// placeholder
 @property (nonatomic, strong) UILabel *placeholderLabel;
+/// insert emoji codes，to delete
+@property (nonatomic, strong) NSMutableArray<NSString *> *emojiCodes;
 
 @end
 
@@ -69,6 +73,17 @@
     return originalRect;
 }
 
+- (void)deleteBackward {
+    [self deleteEmojiCode];
+}
+
+- (NSMutableArray<NSString *> *)emojiCodes {
+    if (!_emojiCodes) {
+        _emojiCodes = [[NSMutableArray alloc] init];
+    }
+    return _emojiCodes;
+}
+
 #pragma mark - Public
 - (void)setPlaceHolder:(NSString *)placeHolder {
     _placeHolder = [placeHolder copy];
@@ -94,6 +109,62 @@
     }
     _placeHolderColor = placeHolderColor;
     _placeholderLabel.textColor = placeHolderColor;
+}
+
+- (void)inputEmojiCode:(NSString *)emojiCode {
+    if (!emojiCode.length) {
+        return;
+    }
+    [self.emojiCodes addObject:emojiCode];
+    
+//    NSMutableString *mutableString = [[NSMutableString alloc] init];
+//    if (self.text.length) {
+//        [mutableString appendString:self.text];
+//    }
+//    [mutableString insertString:emojiCode atIndex:self.selectedRange.location];
+//    self.text = mutableString;
+    
+    [self insertText:emojiCode];
+}
+
+- (void)deleteEmojiCode {
+    
+    NSRange range = self.selectedRange;
+    NSInteger location = (NSInteger)range.location;
+    if (location == 0) {
+        if (range.length) {
+            self.text = @"";
+        }
+        return ;
+    }
+    // 判断是否表情
+    NSString *subString = [self.text substringToIndex:location];
+    if ([subString hasSuffix:@"]"]) {
+        
+        // 查询是否存在表情
+        __block NSString *emoticon = nil;
+        __block NSRange  emoticonRange;
+        
+        [[CATEmojiManager regexEmoticon] enumerateMatchesInString:subString options:kNilOptions range:NSMakeRange(0, subString.length) usingBlock:^(NSTextCheckingResult * _Nullable result, NSMatchingFlags flags, BOOL * _Nonnull stop) {
+            emoticonRange = result.range;
+            emoticon = [subString substringWithRange:result.range];
+        }];
+        if (emoticon) {
+            // 是表情符号,移除
+            if ([self.emojiCodes containsObject:emoticon]) {
+                self.text = [self.text stringByReplacingCharactersInRange:emoticonRange withString:@""];
+                range.location -= emoticonRange.length;
+                range.length = 0;
+                self.selectedRange = range;
+            }
+        } else {
+            [super deleteBackward];
+        }
+        
+    } else {
+        [super deleteBackward];
+    }
+    
 }
 
 #pragma mark - Notification

@@ -8,14 +8,23 @@
 #import "CATEmojiManager.h"
 #import "CATEmojiModel.h"
 
+static NSString *kNameTag       = @"name";
+static NSString *kIconTag       = @"icon";
+static NSString *kCodeTag       = @"code";
+static NSString *kTypeTag       = @"type";
+
 /// 创建静态对象 防止外部访问
 static CATEmojiManager *_instance;
 
 @interface CATEmojiManager ()<NSXMLParserDelegate>
 
-@property (nonatomic, strong) NSMutableArray *emojiList;
+@property (nonatomic, strong) NSMutableArray<CATEmojiModel *> *emojiList;
 // 用来记录当前xml解析的节点名称
-@property (nonatomic, copy) NSString *currentElementName;
+@property (nonatomic, strong) NSMutableString *currentElementName;
+/// 是否匹配到emoji下的标签
+@property (nonatomic, assign) BOOL findTag;
+/// tags
+@property (nonatomic, strong) NSArray<NSString *> *tags;
 
 @end
 
@@ -56,9 +65,22 @@ static CATEmojiManager *_instance;
     return _instance;
 }
 
+
+
++ (NSRegularExpression *)regexEmoticon {
+    static NSRegularExpression *regex;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        regex = [NSRegularExpression regularExpressionWithPattern:@"\\[[^ \\[\\]]+?\\]" options:kNilOptions error:NULL];
+    });
+    return regex;
+}
+
 #pragma mark - Private
 
 - (void)setupParseConfig {
+    _currentElementName = [[NSMutableString alloc] init];
+    _tags = @[kNameTag, kIconTag, kCodeTag, kTypeTag];
 
     NSString *xmlFilePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"emoji" ofType:@"xml"];
     NSData *xmlData = [NSData dataWithContentsOfFile:xmlFilePath];
@@ -85,27 +107,31 @@ static CATEmojiManager *_instance;
 /// 获取节点头
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary<NSString *,NSString *> *)attributeDict {
     
-    self.currentElementName = elementName;
     if ([elementName isEqualToString:@"emoji"]) {
         CATEmojiModel *model = [[CATEmojiModel alloc] init];
         [self.emojiList addObject:model];
     }
-    
+    _findTag = [_tags containsObject:elementName];
 }
 
 /// 获取节点的值 (这个方法在获取到节点头和节点尾后，会分别调用一次)
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string {
     
-    if (_currentElementName != nil) {
-        CATEmojiModel *lastModel = [self.emojiList lastObject];
-        [lastModel setValue:string forKey:_currentElementName];
+    if (_findTag) {
+        [_currentElementName appendString:string];
     }
 }
 
 /// 获取节点尾
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName {
-    _currentElementName = nil;
     
+    if (_currentElementName.length) {
+        
+        NSString *value = [_currentElementName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        CATEmojiModel *lastModel = [self.emojiList lastObject];
+        [lastModel setValue:value forKey:elementName];
+    }
+    [_currentElementName setString:@""];
 }
 
 /// 结束

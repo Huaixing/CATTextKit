@@ -7,8 +7,6 @@
 
 #import <UIKit/UIKit.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
 @interface CATTextView : UITextView
 
 /// place holder color
@@ -20,7 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// place holder
 @property (nonatomic, copy) NSString *placeHolder;
 
+/// emoji code change
+- (void)inputEmojiCode:(NSString *)emojiCode;
+- (void)deleteEmojiCode;
 
 @end
 
-NS_ASSUME_NONNULL_END
+

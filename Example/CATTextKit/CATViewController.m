@@ -25,7 +25,7 @@
 @property (nonatomic, strong) CATKeyboardBar *keyboardBar;
 
 /// uiview
-@property (nonatomic, strong) UIView *photoModuleView;
+@property (nonatomic, strong) UIButton *photoModuleView;
 
 @end
 
@@ -61,8 +61,9 @@
     _keyboardBar.delegate = self;
     [self.view addSubview:_keyboardBar];
     
-    _photoModuleView = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight([UIScreen mainScreen].bounds), _textView.width, 200)];
+    _photoModuleView = [[UIButton alloc] initWithFrame:CGRectMake(0, CGRectGetHeight([UIScreen mainScreen].bounds), _textView.width, 200)];
     _photoModuleView.backgroundColor = [UIColor purpleColor];
+    [_photoModuleView addTarget:self action:@selector(testDeleteEmoji) forControlEvents:UIControlEventTouchUpInside];
     [_textView addSubview:_photoModuleView];
     
     [_textView becomeFirstResponder];
@@ -204,14 +205,14 @@
 
 #pragma mark - CATKeyboardDelegate
 - (void)keyboard:(CATKeyboard *)keyboard didInputEmoji:(CATEmojiModel *)emojiModel {
-    
-    UITextPosition *beginning = _textView.beginningOfDocument;
-    UITextPosition *startPosition = [_textView positionFromPosition:beginning offset:_textView.selectedRange.location];
-    UITextPosition *endPosition = [_textView positionFromPosition:beginning offset:_textView.selectedRange.location + _textView.selectedRange.length];
+    if (!emojiModel.code.length) {
+        return;
+    }
+    [_textView inputEmojiCode:emojiModel.code];
+}
 
-    // 创建一个UITextRange
-    UITextRange *selectionRange = [_textView textRangeFromPosition:startPosition toPosition:endPosition];
-
-    [_textView replaceRange:selectionRange withText:emojiModel.code];
+#pragma mark - Action
+- (void)testDeleteEmoji {
+    [_textView deleteEmojiCode];
 }
 @end
