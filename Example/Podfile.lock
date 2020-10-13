@@ -1,7 +1,7 @@
 PODS:
-  - CATCommonKit (0.2.1):
+  - CATCommonKit (0.2.2):
     - MBProgressHUD (~> 1.2.0)
-  - CATTextKit (0.1.7):
+  - CATTextKit (0.1.8):
     - CATCommonKit (~> 0.2.0)
   - FBSnapshotTestCase (2.1.4):
     - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
@@ -27,8 +27,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  CATCommonKit: 1ac87ad26777decef34fc0ea2e3e2b743536fcf8
-  CATTextKit: 55879db2e6c946e4f6b4684ebd1f0219edb30f24
+  CATCommonKit: d803ae59d5d6bb74b8aff572a51f2b1bdfec187f
+  CATTextKit: 8d07bc6bc6996679377a6a263002d01c3fc84c2d
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
   MBProgressHUD: 3ee5efcc380f6a79a7cc9b363dd669c5e1ae7406
 
