@@ -12,8 +12,7 @@
 
 #define KMArgin                     60
 #define KPositionY                  100
-@interface CATViewController ()<CATKeyboardBarDelegate, UITextViewDelegate, CATKeyboardDelegate>
-{
+@interface CATViewController ()<CATKeyboardBarDelegate, UITextViewDelegate, CATKeyboardDelegate> {
     CGRect _keyboardEndFrame;
 }
 /// textview
@@ -30,7 +29,7 @@
 @end
 
 @implementation CATViewController
-
+// static NSString *topicPattern = @"#[^#\r\n]+#";//@"#[0-9a-zA-Z\\u4e00-\\u9fa5\\s*]+#";
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -49,7 +48,45 @@
     _textView.textContainerInset = UIEdgeInsetsZero;
     _textView.textContainer.lineFragmentPadding = 0;
     [self.view addSubview:_textView];
+    _textView.placeHolder = @"哈哈哈哈";
+    _textView.placeHolderColor = [UIColor redColor];
     
+    /*
+    _textView.scrollEnabled = NO;
+    _textView.textColor = [UIColor blueColor];
+    _textView.editable = NO;
+    NSString *string = @"和发动机康师傅空间撒#凤凰山#打发货单撒发货单索拉卡返回的森林防火删掉了粉红色的啦";
+    
+    NSMutableAttributedString *attString = [[NSMutableAttributedString alloc] initWithString:string];
+    [attString addAttribute:NSForegroundColorAttributeName value:_textView.textColor range:NSMakeRange(0, string.length)];
+    [attString addAttribute:NSFontAttributeName value:_textView.font range:NSMakeRange(0, string.length)];
+    static NSRegularExpression *regExpress = nil;
+    if (regExpress == nil) {
+        regExpress = [[NSRegularExpression alloc]initWithPattern:topicPattern options:0 error:nil];
+    }
+    //通过正则表达式识别出emojiText
+    NSArray *matches = [regExpress matchesInString:string options:0 range:NSMakeRange(0, string.length)];
+    if(matches.count > 0){
+        for (NSTextCheckingResult *result in [matches reverseObjectEnumerator]) {
+            
+            
+            
+            
+            [attString addAttribute:NSLinkAttributeName
+                               value:@""
+                               range:result.range];
+            
+                [attString addAttribute:NSUnderlineStyleAttributeName
+                               value:@(NSUnderlineStyleNone)
+                               range:result.range];
+            [attString addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:result.range];
+                [attString endEditing];
+        }
+    }
+    // 这个不加的话颜色无法单独控制
+    _textView.linkTextAttributes = @{};
+    _textView.attributedText = attString;
+     */
     
     _keyboard = [[CATKeyboard alloc] initWithFrame:CGRectMake(0, CGRectGetHeight([UIScreen mainScreen].bounds), self.view.width, 355) categorys:nil];
     _keyboard.delegate = self;
@@ -166,7 +203,7 @@
             if (textSize.height < KPositionY) {
             } else {
                 _photoModuleView.y = textSize.height;
-                [self.textView scrollRectToVisible:[self.textView firstRectForRange:self.textView.selectedTextRange] animated:YES];
+                [self.textView scrollRectToVisible:[self.textView firstRectForRange:self.textView.selectedTextRange] animated:NO];
             }
         }
         
@@ -187,16 +224,6 @@
         [self resignActivity];
     }
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 
 - (void)textViewDidChange:(UITextView *)textView {

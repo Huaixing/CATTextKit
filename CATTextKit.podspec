@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CATTextKit'
-  s.version          = '0.1.7'
+  s.version          = '0.1.8'
   s.summary          = 'text view and text label'
   s.description      = <<-DESC
 Emoji text view and text label
@@ -9,11 +9,11 @@ Emoji text view and text label
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Huaixing' => 'shxwork@163.com' }
   s.source           = { :git => 'https://github.com/Huaixing/CATTextKit.git', :tag => s.version.to_s }
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '11.0'
   s.source_files = 'CATTextKit/Classes/**/*'
   s.resources = ['CATTextKit/Emoji/*.xml','CATTextKit/Emoji/*.bundle',]
   s.resource_bundles = {
     'CATTextKit' => ['CATTextKit/Assets/*.png']
   }
-  s.dependency 'CATCommonKit', '~> 0.1.5'
+  s.dependency 'CATCommonKit', '~> 0.2.0'
 end

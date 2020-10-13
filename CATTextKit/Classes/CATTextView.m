@@ -8,6 +8,7 @@
 #import "CATTextView.h"
 
 #import "CATEmojiManager.h"
+#import <CATCommonKit/CATCommonKit.h>
 
 @interface CATTextView () {
     // 是否已经设置了placeholder的位置
@@ -31,7 +32,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _settedPlaceholderPosition = NO;
+        _settedPlaceholderPosition = YES;
         
         _placeholderLabel = [[UILabel alloc] init];
         _placeholderLabel.backgroundColor = [UIColor clearColor];
@@ -52,12 +53,14 @@
     [super layoutSubviews];
     
     if (_placeholderLabel.text.length) {
-        // 设置placeholder初始位置
-        [self caretRectForPosition:self.selectedTextRange.start];
-        CGSize size = [_placeholderLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.frame) - 2 * CGRectGetMinX(_placeholderLabel.frame), CGRectGetHeight(self.frame))];
-        CGRect frame = _placeholderLabel.frame;
-        frame.size = size;
-        _placeholderLabel.frame = frame;
+        _settedPlaceholderPosition = NO;
+        /// 获取光标文首位置
+        UITextPosition *begin = self.beginningOfDocument;
+        UITextPosition *start = [self positionFromPosition:begin offset:0];
+        /// 设置placeholder初始位置
+        [self caretRectForPosition:start];
+        _placeholderLabel.width = self.width - 2 * _placeholderLabel.x;
+        [self.placeholderLabel sizeToFit];
     }
 }
 
@@ -75,6 +78,21 @@
 
 - (void)deleteBackward {
     [self deleteEmojiCode];
+}
+
+- (void)setFont:(UIFont *)font {
+    [super setFont:font];
+    _placeholderLabel.font = font;
+}
+
+- (void)setText:(NSString *)text {
+    [super setText:text];
+    _placeholderLabel.hidden = self.hasText;
+}
+
+- (void)setAttributedText:(NSAttributedString *)attributedText {
+    [super setAttributedText:attributedText];
+    _placeholderLabel.hidden = self.hasText;
 }
 
 - (NSMutableArray<NSString *> *)emojiCodes {

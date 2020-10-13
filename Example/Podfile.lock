@@ -1,33 +1,37 @@
 PODS:
-  - CATCommonKit (0.1.5)
+  - CATCommonKit (0.2.1):
+    - MBProgressHUD (~> 1.2.0)
   - CATTextKit (0.1.7):
-    - CATCommonKit (~> 0.1.5)
+    - CATCommonKit (~> 0.2.0)
   - FBSnapshotTestCase (2.1.4):
     - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
   - FBSnapshotTestCase/Core (2.1.4)
   - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
+  - MBProgressHUD (1.2.0)
 
 DEPENDENCIES:
-  - CATCommonKit (~> 0.1.5)
+  - CATCommonKit (~> 0.2.0)
   - CATTextKit (from `../`)
   - FBSnapshotTestCase
 
 SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - FBSnapshotTestCase
+    - MBProgressHUD
   https://github.com/Huaixing/CATMasterRepos.git:
     - CATCommonKit
-  trunk:
-    - FBSnapshotTestCase
 
 EXTERNAL SOURCES:
   CATTextKit:
     :path: "../"
 
 SPEC CHECKSUMS:
-  CATCommonKit: bf996cc1c00054a3de19693cf8bca26c6d23ff3d
-  CATTextKit: 952b6cd88b554afac88bdd1a2eff8006769f4be0
+  CATCommonKit: 1ac87ad26777decef34fc0ea2e3e2b743536fcf8
+  CATTextKit: 55879db2e6c946e4f6b4684ebd1f0219edb30f24
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  MBProgressHUD: 3ee5efcc380f6a79a7cc9b363dd669c5e1ae7406
 
-PODFILE CHECKSUM: 4f0c910aca65a3f6723fe00e2c4a9205d58793b0
+PODFILE CHECKSUM: bf281f07dc4d61e5e42a87ff9cb0e29010fd3050
 
 COCOAPODS: 1.9.3
