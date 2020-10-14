@@ -163,13 +163,14 @@
     // textview 底部inset = 键盘高度 + 输入bar高度 + 留白
     CGFloat contentInsetBottom = (CGRectGetHeight(_keyboardEndFrame) + _keyboardBar.height) + KMArgin;
     // 键盘上方bar始终显示
-    CGFloat toFrameY = toFrameY = (screenHeight - _keyboard.height - _keyboardBar.height);
+    CGFloat toFrameY = (screenHeight - _keyboard.height - _keyboardBar.height);
     
     [UIView animateWithDuration:0.25 animations:^{
         self.keyboardBar.y = toFrameY;
     } completion:^(BOOL finished) {
         self.textView.contentInset = UIEdgeInsetsMake(0, 0, contentInsetBottom, 0);
     }];
+    // 唤起系统键盘时，更新照片位置
     [self updatePhotoModulePositionY];
 }
 
@@ -194,6 +195,7 @@
 }
 
 
+/// 唤起系统键盘时，更新照片位置
 - (void)updatePhotoModulePositionY {
     CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
     if (_textView.text.length) {
