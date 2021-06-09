@@ -23,33 +23,59 @@
 /// key board bar
 @property (nonatomic, strong) CATKeyboardBar *keyboardBar;
 
-/// uiview
-@property (nonatomic, strong) UIButton *photoModuleView;
+///// uiview
+//@property (nonatomic, strong) UIButton *photoModuleView;
 
 @end
 
 @implementation CATViewController
 // static NSString *topicPattern = @"#[^#\r\n]+#";//@"#[0-9a-zA-Z\\u4e00-\\u9fa5\\s*]+#";
+
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    
+}
+
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor whiteColor];
     
+//    _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 200, self.view.width, 300)];
+//    _scrollView.backgroundColor = [UIColor redColor];
+//    _scrollView.pagingEnabled = YES;
+//    _scrollView.contentSize = CGSizeMake(_scrollView.width * 2, _scrollView.height);
+//    [self.view addSubview:_scrollView];
+//
+//
+//    UIView *blueView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _scrollView.width, _scrollView.height)];
+//    blueView.backgroundColor = [UIColor blueColor];
+//    [_scrollView addSubview:blueView];
+//
+//
+//    UIView *greenView = [[UIView alloc] initWithFrame:CGRectMake(_scrollView.width, 0, _scrollView.width, _scrollView.height)];
+//    greenView.backgroundColor = [UIColor greenColor];
+//    [_scrollView addSubview:greenView];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
-    
-    
-    _textView = [[CATTextView alloc] initWithFrame:CGRectMake(0, 88, self.view.width, self.view.height - 88)];
+//
+//
+    _textView = [[CATTextView alloc] init];
     _textView.backgroundColor = [UIColor lightGrayColor];
-    _textView.font = [UIFont systemFontOfSize:16];
-    _textView.delegate = self;
-    _textView.layoutManager.allowsNonContiguousLayout = NO;
-    _textView.alwaysBounceVertical = YES;
-    _textView.textContainerInset = UIEdgeInsetsZero;
-    _textView.textContainer.lineFragmentPadding = 0;
+//    _textView.font = [UIFont systemFontOfSize:16];
+//    _textView.delegate = self;
+//    _textView.layoutManager.allowsNonContiguousLayout = NO;
+//    _textView.textContainerInset = UIEdgeInsetsZero;
+//    _textView.textContainer.lineFragmentPadding = 0;
+//    _textView.alwaysBounceVertical = YES;
     [self.view addSubview:_textView];
-    _textView.placeHolder = @"哈哈哈哈";
-    _textView.placeHolderColor = [UIColor redColor];
+//    _textView.placeHolder = @"哈哈哈哈";
+//    _textView.placeHolderColor = [UIColor redColor];
+//    _textView.text = @"和大家开始的会计师课件是否开始点击回复会计师的";
     
     /*
     _textView.scrollEnabled = NO;
@@ -88,22 +114,31 @@
     _textView.attributedText = attString;
      */
     
-    _keyboard = [[CATKeyboard alloc] initWithFrame:CGRectMake(0, CGRectGetHeight([UIScreen mainScreen].bounds), self.view.width, 355) categorys:nil];
+    _keyboard = [[CATKeyboard alloc] init];
     _keyboard.delegate = self;
     [self.view addSubview:_keyboard];
-    
-    CGFloat barHeight = 64;
-    _keyboardBar = [[CATKeyboardBar alloc] initWithFrame:CGRectMake(0, self.view.height - barHeight, self.view.width, barHeight)];
+
+    _keyboardBar = [[CATKeyboardBar alloc] init];
     _keyboardBar.backgroundColor = [UIColor redColor];
     _keyboardBar.delegate = self;
+    _keyboardBar.alpha = 0;
     [self.view addSubview:_keyboardBar];
+//
+//    _photoModuleView = [[UIButton alloc] initWithFrame:CGRectMake(0, CGRectGetHeight([UIScreen mainScreen].bounds), _textView.width, 200)];
+//    _photoModuleView.backgroundColor = [UIColor purpleColor];
+//    [_photoModuleView addTarget:self action:@selector(testDeleteEmoji) forControlEvents:UIControlEventTouchUpInside];
+//    [_textView addSubview:_photoModuleView];
+//
+//    [_textView becomeFirstResponder];
+}
+
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    _textView.frame = CGRectMake(0, 88, self.view.width, 100);
+    _keyboard.frame = CGRectMake(0, self.view.height, self.view.width, 355);
     
-    _photoModuleView = [[UIButton alloc] initWithFrame:CGRectMake(0, CGRectGetHeight([UIScreen mainScreen].bounds), _textView.width, 200)];
-    _photoModuleView.backgroundColor = [UIColor purpleColor];
-    [_photoModuleView addTarget:self action:@selector(testDeleteEmoji) forControlEvents:UIControlEventTouchUpInside];
-    [_textView addSubview:_photoModuleView];
-    
-    [_textView becomeFirstResponder];
+    CGFloat barHeight = 44;
+    _keyboardBar.frame = CGRectMake(0, self.view.height - barHeight, self.view.width, barHeight);
 }
 
 - (void)keyboardWillShow:(NSNotification *)notification {
@@ -120,117 +155,119 @@
     }
 }
 
-- (void)textViewBecomeActivity {
-    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
+- (void)keyboardBecomeActivity {
+//    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
     // 显示系统键盘
     if (!_textView.isFirstResponder) {
         [_textView becomeFirstResponder];
     }
     // 隐藏自定键盘
-    if (CGRectGetMinY(_keyboard.frame) < screenHeight) {
+    if (CGRectGetMinY(_keyboard.frame) < self.view.height) {
         [UIView animateWithDuration:0.25 animations:^{
-            self.keyboard.y = screenHeight;
+            self.keyboard.y = self.view.height;
         }];
     }
     // 键盘上方bar始终显示
     CGFloat toFrameY = CGRectGetMinY(_keyboardEndFrame) - _keyboardBar.height;
     // textview 底部inset = 键盘高度 + 输入bar高度 + 留白
-    CGFloat contentInsetBottom = (CGRectGetHeight(_keyboardEndFrame) + _keyboardBar.height) + KMArgin;
-    
+//    CGFloat contentInsetBottom = (CGRectGetHeight(_keyboardEndFrame) + _keyboardBar.height) + KMArgin;
+
     [UIView animateWithDuration:0.25 animations:^{
         self.keyboardBar.y = toFrameY;
+        self.keyboardBar.alpha = 1;
     } completion:^(BOOL finished) {
-        self.textView.contentInset = UIEdgeInsetsMake(0, 0, contentInsetBottom, 0);
+//        self.textView.contentInset = UIEdgeInsetsMake(0, 0, contentInsetBottom, 0);
     }];
     // 唤起系统键盘时，更新照片位置
-    [self updatePhotoModulePositionY];
+//    [self updatePhotoModulePositionY];
 }
 
-- (void)keyboardBecomeActivity {
-    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
+- (void)emojiboardBecomeActivity {
+//    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
     // 隐藏系统键盘
     if (_textView.isFirstResponder) {
         [_textView resignFirstResponder];
     }
-    
+
     // 显示自定义键盘
-    if (CGRectGetMinY(_keyboard.frame) >= screenHeight) {
+    if (CGRectGetMinY(_keyboard.frame) >= self.view.height) {
         [UIView animateWithDuration:0.25 animations:^{
-            self.keyboard.y = (screenHeight - self.keyboard.height);
+            self.keyboard.y = (self.view.height - self.keyboard.height);
         }];
     }
-    
+
     // textview 底部inset = 键盘高度 + 输入bar高度 + 留白
-    CGFloat contentInsetBottom = (CGRectGetHeight(_keyboardEndFrame) + _keyboardBar.height) + KMArgin;
+//    CGFloat contentInsetBottom = (CGRectGetHeight(_keyboardEndFrame) + _keyboardBar.height) + KMArgin;
     // 键盘上方bar始终显示
-    CGFloat toFrameY = (screenHeight - _keyboard.height - _keyboardBar.height);
-    
+    CGFloat toFrameY = (self.view.height - _keyboard.height - _keyboardBar.height);
+
     [UIView animateWithDuration:0.25 animations:^{
         self.keyboardBar.y = toFrameY;
     } completion:^(BOOL finished) {
-        self.textView.contentInset = UIEdgeInsetsMake(0, 0, contentInsetBottom, 0);
+//        self.textView.contentInset = UIEdgeInsetsMake(0, 0, contentInsetBottom, 0);
     }];
     // 唤起系统键盘时，更新照片位置
-    [self updatePhotoModulePositionY];
+//    [self updatePhotoModulePositionY];
 }
 
-- (void)resignActivity {
+- (void)resignBoardActivity {
     if (_textView.isFirstResponder) {
         [_textView resignFirstResponder];
     }
-    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
+//    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
     // 隐藏自定键盘
-    if (CGRectGetMinY(_keyboard.frame) < screenHeight) {
+    if (CGRectGetMinY(_keyboard.frame) < self.view.height) {
         [UIView animateWithDuration:0.25 animations:^{
-            self.keyboard.y = screenHeight;
+            self.keyboard.y = self.view.height;
         }];
     }
     // 键盘上方bar始终显示
-    if (_keyboardBar.y < screenHeight) {
-        CGFloat toFrameY = screenHeight - _keyboardBar.height;
+    if (_keyboardBar.y < self.view.height) {
+        CGFloat toFrameY = self.view.height - _keyboardBar.height;
         [UIView animateWithDuration:0.25 animations:^{
             self.keyboardBar.y = toFrameY;
+            self.keyboardBar.alpha = 0;
         }];
     }
 }
 
 
-/// 唤起系统键盘时，更新照片位置
-- (void)updatePhotoModulePositionY {
-    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
-    if (_textView.text.length) {
-        if (_keyboardBar.bottom < screenHeight) {
-            // 有键盘
-            CGSize textSize = [_textView sizeThatFits:CGSizeMake(_textView.width, MAXFLOAT)];
-            if (textSize.height < KPositionY) {
-            } else {
-                _photoModuleView.y = textSize.height;
-                [self.textView scrollRectToVisible:[self.textView firstRectForRange:self.textView.selectedTextRange] animated:NO];
-            }
-        }
-        
-    } else {
-        _photoModuleView.y = KPositionY;// 默认
-    }
-}
+///// 唤起系统键盘时，更新照片位置
+//- (void)updatePhotoModulePositionY {
+//    CGFloat screenHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
+//    if (_textView.text.length) {
+//        if (_keyboardBar.bottom < screenHeight) {
+//            // 有键盘
+//            CGSize textSize = [_textView sizeThatFits:CGSizeMake(_textView.width, MAXFLOAT)];
+//            if (textSize.height < KPositionY) {
+//            } else {
+//                _photoModuleView.y = textSize.height;
+//                [self.textView scrollRectToVisible:[self.textView firstRectForRange:self.textView.selectedTextRange] animated:NO];
+//            }
+//        }
+//
+//    } else {
+//        _photoModuleView.y = KPositionY;// 默认
+//    }
+//}
 
 
 #pragma mark - CATKeyboardBarDelegate
 - (void)keyboardBarDidClickBarButton:(CATKeyboardBar *)bar {
-    
+
     if (bar.currentClickType == CATBarButtonTypeKeyboard) {
-        [self textViewBecomeActivity];
-    } else if (bar.currentClickType == CATBarButtonTypeEmoji) {
         [self keyboardBecomeActivity];
+    } else if (bar.currentClickType == CATBarButtonTypeEmoji) {
+        [self emojiboardBecomeActivity];
     } else {
-        [self resignActivity];
+        [self resignBoardActivity];
     }
 }
 
 
-- (void)textViewDidChange:(UITextView *)textView {
-    [self updatePhotoModulePositionY];
-}
+//- (void)textViewDidChange:(UITextView *)textView {
+//    [self updatePhotoModulePositionY];
+//}
 
 #pragma mark - CATKeyboardDelegate
 - (void)keyboard:(CATKeyboard *)keyboard didInputEmoji:(CATEmojiModel *)emojiModel {
@@ -240,8 +277,8 @@
     [_textView inputEmojiCode:emojiModel.code];
 }
 
-#pragma mark - Action
-- (void)testDeleteEmoji {
-    [_textView deleteEmojiCode];
-}
+//#pragma mark - Action
+//- (void)testDeleteEmoji {
+//    [_textView deleteEmojiCode];
+//}
 @end

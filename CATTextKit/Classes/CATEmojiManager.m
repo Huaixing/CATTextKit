@@ -51,7 +51,7 @@ static CATEmojiManager *_instance;
 
 - (instancetype)init {
     if (self = [super init]) {
-        [self setupParseConfig];
+        [self setupParseOption];
     }
     return self;
 }
@@ -78,7 +78,7 @@ static CATEmojiManager *_instance;
 
 #pragma mark - Private
 
-- (void)setupParseConfig {
+- (void)setupParseOption {
     _currentElementName = [[NSMutableString alloc] init];
     _tags = @[kNameTag, kIconTag, kCodeTag, kTypeTag];
 

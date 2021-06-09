@@ -13,7 +13,7 @@ Emoji text view and text label
   s.source_files = 'CATTextKit/Classes/**/*'
   s.resources = ['CATTextKit/Emoji/*.xml','CATTextKit/Emoji/*.bundle',]
   s.resource_bundles = {
-    'CATTextKit' => ['CATTextKit/Assets/*.png']
+    'CATTextKit' => ['CATTextKit/Assets/**/*']
   }
   s.dependency 'CATCommonKit', '~> 0.2.0'
 end

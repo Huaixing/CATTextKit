@@ -39,6 +39,9 @@
         _placeholderLabel.numberOfLines = 0;
         [self addSubview:_placeholderLabel];
         
+        self.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        self.font = [UIFont systemFontOfSize:16];
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textViewTextDidChange:) name:UITextViewTextDidChangeNotification object:self];
     }
     return self;

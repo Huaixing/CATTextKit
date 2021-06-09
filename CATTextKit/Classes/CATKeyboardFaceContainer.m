@@ -6,12 +6,12 @@
 //
 
 #import "CATKeyboardFaceContainer.h"
-#import "CATKeyboardFaceItem.h"
 
 #import "CATKeyboardFaceButton.h"
 
-#import "CATEmojiModel.h"
+#import "CATEmojiManager.h"
 #import <CATCommonKit/CATCommonKit.h>
+#import "CATEmojiModel.h"
 
 @interface CATKeyboardFaceContainer ()
 /// scrollview
@@ -26,13 +26,35 @@
 -(instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _scrollView = [[UIScrollView alloc] init];
-        _scrollView.alwaysBounceVertical = YES;
-        _scrollView.showsHorizontalScrollIndicator = NO;
-        _scrollView.showsVerticalScrollIndicator = YES;
-        [self addSubview:_scrollView];
+        [self createSubViews];
     }
     return self;
+}
+
+- (void)createSubViews {
+    
+    _scrollView = [[UIScrollView alloc] init];
+    _scrollView.alwaysBounceVertical = YES;
+    _scrollView.showsHorizontalScrollIndicator = NO;
+    _scrollView.showsVerticalScrollIndicator = YES;
+    [self addSubview:_scrollView];
+    
+    if ([CATEmojiManager manager].emojiModels.count) {
+        for (NSInteger index = 0; index < [CATEmojiManager manager].emojiModels.count; index ++) {
+            CATEmojiModel *emoji = [[CATEmojiManager manager].emojiModels objectAtIndex:index];
+            if (!emoji.faceImage) {
+                continue;
+            }
+            CATKeyboardFaceButton *button = [[CATKeyboardFaceButton alloc] init];
+            button.backgroundColor = [UIColor clearColor];
+            button.emojiModel = emoji;
+            [_scrollView addSubview:button];
+            [self.faceButtons addObject:button];
+            
+            [button addTarget:self action:@selector(faceButtonDidClick:) forControlEvents:UIControlEventTouchUpInside];
+        }
+    }
+    
 }
 
 - (NSMutableArray<CATKeyboardFaceButton *> *)faceButtons {
@@ -42,39 +64,25 @@
     return _faceButtons;
 }
 
-- (void)setCategoryItem:(CATKeyboardFaceItem *)categoryItem {
-    _categoryItem = categoryItem;
-    [self.faceButtons removeAllObjects];
-    
-    for (CATEmojiModel *model in categoryItem.items) {
-        CATKeyboardFaceButton *button = [[CATKeyboardFaceButton alloc] init];
-        button.emojiModel = model;
-        button.backgroundColor = [UIColor whiteColor];
-        [button addTarget:self action:@selector(faceButtonDidClick:) forControlEvents:UIControlEventTouchUpInside];
-        [self.faceButtons addObject:button];
-        [_scrollView addSubview:button];
-    }
-}
-
 - (void)layoutSubviews {
     [super layoutSubviews];
     
     _scrollView.frame = self.bounds;
-    
-    if (_categoryItem.type == CATKeyboardFaceTypeEmoji) {
-        // emoji
-        CGFloat buttonWidth = (_scrollView.width - _categoryItem.horMargin) / _categoryItem.columnCount;
-        CGFloat buttonHeight = buttonWidth;
-        
-        for (NSInteger index = 0; index < self.faceButtons.count; index ++) {
-            // 第row行
-            NSUInteger row = index / _categoryItem.columnCount;
-            // 第col列
-            NSUInteger col = index % _categoryItem.columnCount;
-            CATKeyboardFaceButton *button = [self.faceButtons objectAtIndex:index];
-            button.frame = CGRectMake(col * (buttonWidth + _categoryItem.horMargin), row * (buttonHeight + _categoryItem.verMargin), buttonWidth, buttonHeight);
-        }
+    // emoji
+    NSUInteger columnCount = 6;
+    CGFloat buttonMargin = 7;
+    CGFloat buttonWidth = (_scrollView.width - (columnCount - 1) * buttonMargin) / columnCount;
+    CGFloat buttonHeight = buttonWidth;
+
+    for (NSInteger index = 0; index < self.faceButtons.count; index ++) {
+        // 第row行
+        NSUInteger row = index / columnCount;
+        // 第col列
+        NSUInteger col = index % columnCount;
+        CATKeyboardFaceButton *button = [self.faceButtons objectAtIndex:index];
+        button.frame = CGRectMake(col * (buttonWidth + buttonMargin), row * (buttonHeight + buttonMargin), buttonWidth, buttonHeight);
     }
+
     _scrollView.contentSize = CGSizeMake(_scrollView.width, [self.faceButtons lastObject].bottom);
 }
 

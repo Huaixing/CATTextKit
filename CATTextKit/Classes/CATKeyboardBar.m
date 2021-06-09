@@ -86,7 +86,6 @@
 
 #pragma mark - Action
 - (void)barButtonDidClick:(CATKeyboardBarButton *)sender {
-    
     self.currentClickType = sender.type;
 }
 
